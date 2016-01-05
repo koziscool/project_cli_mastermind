@@ -26,6 +26,7 @@ class Row
     def to_s
         colors = @slots.map { |slot| slot.color }
         colors.join(", ")
+        puts colors
     end
 end
 
@@ -43,28 +44,29 @@ class Board
     end
 
     def create_autogenerate_solution 
-    solution = []
-    Row::NUM_PEGS.times do
-        solution << Peg::COLORS.sample
-    end
-    create_solution( solution )
+        solution = []
+        Row::NUM_PEGS.times do
+            solution << Peg::COLORS.sample
+        end
+        create_solution( solution )
     end
 
-    def add_guess_row( guess )
+    def add_guess_row( guess_string_arr )   # guess is an array of strings here
         guess_row = Row.new
-        guess_row.populate_row(guess)
-        @guesses << guess_row
+        guess_row.populate_row( guess_string_arr )
+        new_guess = Guess.new ( guess_row )
+        @guesses << new_guess
     end
 
     def to_s
-        @guesses.each { | guess |  guess.to_s }
+        @guesses.each { | guess |  guess.row.to_s }
     end
 end
 
 ##########
 
 class Guess
-    attr_accessor :response
+    attr_accessor :response, :row
     def initialize ( row )
         @row = row
     end
@@ -77,6 +79,11 @@ class Guess
         puts " full matches: #{@response[:full_matches]}, 
                     color matches: #{@response[:color_matches]}, 
                     misses: #{@response[:misses]}}"
+    end
+
+    def to_s
+        row.to_s
+        response.to_s
     end
 end
 
@@ -100,6 +107,11 @@ class Mastermind
         @board.create_autogenerate_solution
         @board.add_guess_row( @guesser.make_a_guess )
 
+        @board.guesses.each { |guess| puts guess }
+        respond_to_guess
+        @board.solution_row.to_s
+        @board.guesses.each { |guess| puts guess }
+
     end
 
     def check_win?
@@ -107,19 +119,19 @@ class Mastermind
     end
 
     def respond_to_guess
-        guess = @board.guesses.last
-        solution = @board.solution_row
+        guess_row = @board.guesses.last.row.slots
+        solution_row = @board.solution_row.slots
 
         remainder_guess = Hash.new(0)
         remainder_solution = Hash.new(0)
 
         full_matches = 0
-        (0...Row::NUM_PEGS).each do |index|
-            if guess[index] == solution[index]
+        ( 0...Row::NUM_PEGS ).each do |index|
+            if guess_row[index].color == solution_row[index].color
                 full_matches += 1
             else
-                remainder_guess[ guess[index].color ] += 1
-                remainder_solution[ solution[index].color ] += 1
+                remainder_guess[ guess_row[index].color ] += 1
+                remainder_solution[ solution_row[index].color ] += 1
             end
         end
 
@@ -130,6 +142,7 @@ class Mastermind
 
         misses = Row::NUM_PEGS - full_matches - color_matches
         response = { full_matches: full_matches, color_matches: color_matches, misses: misses }
+        @board.guesses.last.response = response
         response
     end
 end
@@ -139,7 +152,7 @@ end
 class Player
   def make_a_guess
     puts "What is your guess?"
-    guess = gets.chomp.split(",")
+    guess = gets.chomp.split(", ")
     guess.each{ |color| color.strip! }
     guess
   end
