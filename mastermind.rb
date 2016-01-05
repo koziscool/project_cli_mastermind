@@ -1,7 +1,5 @@
 
 
-PEGS_IN_ROW = 4
-
 class Peg
     COLORS = [ "yellow", "green", "purple", "orange", "blue", "brown"]
     attr_accessor :color
@@ -10,7 +8,10 @@ class Peg
     end
 end
 
+######
+
 class Row 
+    NUM_PEGS = 4
     attr_accessor :slots
     def initialize
         @slots = []
@@ -28,33 +29,58 @@ class Row
     end
 end
 
+#########
+
 class Board
-  attr_accessor :solution_row, :guesses
-  def initialize
-    @solution_row = Row.new
-    @guesses = []
-  end
+    attr_accessor :solution_row, :guesses
+    def initialize
+        @solution_row = Row.new
+        @guesses = []
+    end
 
-  def create_solution ( solution )
-    @solution_row.populate_row ( solution )
-  end
+    def create_solution ( solution )
+        @solution_row.populate_row ( solution )
+    end
 
-  def create_autogenerate_solution 
+    def create_autogenerate_solution 
     solution = []
-    PEGS_IN_ROW.times do
-      solution << Peg::COLORS.sample
+    Row::NUM_PEGS.times do
+        solution << Peg::COLORS.sample
     end
     create_solution( solution )
-  end
+    end
 
-  def add_guess_row( guess )
-    guess_row = Row.new
-    guess_row.populate_row(guess)
-    @guesses << guess_row
-  end
+    def add_guess_row( guess )
+        guess_row = Row.new
+        guess_row.populate_row(guess)
+        @guesses << guess_row
+    end
+
+    def to_s
+        @guesses.each { | guess |  guess.to_s }
+    end
 end
 
+##########
 
+class Guess
+    attr_accessor :response
+    def initialize ( row )
+        @row = row
+    end
+
+    def populate_repsonse
+        @response = response
+    end
+
+    def display_response
+        puts " full matches: #{@response[:full_matches]}, 
+                    color matches: #{@response[:color_matches]}, 
+                    misses: #{@response[:misses]}}"
+    end
+end
+
+###########
 
 class Mastermind
 
@@ -72,8 +98,8 @@ class Mastermind
     def play
         instructions
         @board.create_autogenerate_solution
-        
-        @board.add_guess_row(@guesser.make_a_guess)
+        @board.add_guess_row( @guesser.make_a_guess )
+
     end
 
     def check_win?
@@ -88,7 +114,7 @@ class Mastermind
         remainder_solution = Hash.new(0)
 
         full_matches = 0
-        (0...PEGS_IN_ROW).each do |index|
+        (0...Row::NUM_PEGS).each do |index|
             if guess[index] == solution[index]
                 full_matches += 1
             else
@@ -99,16 +125,16 @@ class Mastermind
 
         color_matches = 0
         remainder_guess.each do | color, color_multiplicity |
-        color_matches += [ remainder_solution[color], color_multiplicity ].min
+            color_matches += [ remainder_solution[color], color_multiplicity ].min
         end
 
-        misses = PEGS_IN_ROW - full_matches - color_matches
+        misses = Row::NUM_PEGS - full_matches - color_matches
         response = { full_matches: full_matches, color_matches: color_matches, misses: misses }
         response
     end
 end
 
-
+#########
 
 class Player
   def make_a_guess
@@ -133,17 +159,17 @@ class Computer < Player
   end
 end
 
-
+##############
 
 
 test_game = Mastermind.new
 test_game.play
 
-test_board = Board.new
-test_board.create_autogenerate_solution()
-puts test_board.solution_row.to_s
-test_board.add_guess_row(Row.new.populate_row(["yellow", "blue", "orange", "green"]))
-puts test_board.guesses.last.to_s
+# test_board = Board.new
+# test_board.create_autogenerate_solution()
+# puts test_board.solution_row.to_s
+# test_board.add_guess_row(Row.new.populate_row(["yellow", "blue", "orange", "green"]))
+# puts test_board.guesses.last.to_s
 
 # the_mind = Mastermind.new
 # the_mind.play
