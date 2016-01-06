@@ -18,26 +18,38 @@ class Mastermind
     end
 
     def instructions
-        puts "make a guess"
-        puts "if incorrect, make another"
+        # puts "make a guess"
+        # puts "if incorrect, make another"
     end
 
     def play
         instructions
         @board.create_autogenerate_solution
-        @board.add_guess_row( @guesser.make_a_guess )
 
-        puts
-        puts @board.guesses.last.to_s 
+        num_guesses = 0
+        while num_guesses < 15 do
+            @board.add_guess_row( @guesser.make_a_guess )
 
-        respond_to_guess
+            # puts
+            # puts @board.guesses.last.to_s 
 
-        puts
-        puts  "#{@board.solution_row.to_s}"
-        puts @board.guesses.last.to_s
+            respond_to_guess
+
+            # puts
+            # puts  "#{@board.solution_row.to_s}"
+            num_guesses += 1
+            puts "Guess ##{num_guesses}"
+            puts @board.guesses.last.to_s
+            puts
+
+            if win?
+                puts "you win, congratulations"
+                break
+            end
+        end
     end
 
-    def check_win?
+    def win?
         @board.guesses.last == @board.solution_row
     end
 
