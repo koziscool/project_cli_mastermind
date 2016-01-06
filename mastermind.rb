@@ -67,6 +67,9 @@ class Mastermind
     end
 end
 
+
+
+
 test_game = Mastermind.new
 test_game.play
 
