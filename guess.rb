@@ -15,7 +15,11 @@ class Guess
     end
 
     def to_s
-        row.to_s
-        response.to_s
+        ret_string =  "The guess: #{row.to_s} \n"
+        if @response
+            response_string = "full matches: #{response[:full_matches]}, color matches: #{response[:color_matches]}, misses #{response[:color_matches]}"
+            ret_string << "Simon says, #{response_string}"
+        end
+        ret_string
     end
 end

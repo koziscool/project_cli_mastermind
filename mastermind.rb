@@ -27,11 +27,14 @@ class Mastermind
         @board.create_autogenerate_solution
         @board.add_guess_row( @guesser.make_a_guess )
 
-        @board.guesses.each { |guess| puts guess }
-        respond_to_guess
-        @board.solution_row.to_s
-        @board.guesses.each { |guess| puts guess }
+        puts
+        puts @board.guesses.last.to_s 
 
+        respond_to_guess
+
+        puts
+        puts  "#{@board.solution_row.to_s}"
+        puts @board.guesses.last.to_s
     end
 
     def check_win?

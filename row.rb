@@ -15,6 +15,6 @@ class Row
     def to_s
         colors = @slots.map { |slot| slot.color }
         colors.join(", ")
-        puts colors
+        colors
     end
 end
